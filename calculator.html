@@ -18,12 +18,12 @@
     const calcRegex = /^([0-9]|-|\+|\*|\/|\.)*$/
     const keyboard = [
       7,8,9,"/","C",
-      4,5,6,"*","Del",
-      1,2,3,"-","Ad",
+      4,5,6,"*","DEL",
+      1,2,3,"-","AD",
       0,".","+","="
     ]
     const advKeys = [
-      "(",")","Hist","Up","AC"
+      "(",")","HIST","UP","AC"
     ]
     
     const Header = () => <div className="header">Calculator</div>
@@ -41,6 +41,13 @@
 
     const Calculator = () => {
       const [display, setDisplay] = React.useState("")
+      const [error, setError] = React.useState()
+
+      React.useEffect(() => {
+        if (error) {
+          setError()
+        }
+      }, [display])
 
       const doMath = () => {
         try {
@@ -55,6 +62,24 @@
         switch (value) {
           case '=':
             doMath()
+            break
+          case 'C':
+            setDisplay('')
+            break
+          case 'DEL':
+            setDisplay(display.substring(0, display.length - 1))
+            break
+          case 'AD':
+            // doMath()
+            break
+          case 'HIST':
+            // doMath()
+            break
+          case 'AC':
+            setDisplay()
+            break
+          case 'UP':
+            // doMath()
             break
           default: setDisplay(`${display}${value}`)
         }
