@@ -16,17 +16,18 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script type="text/babel">
     const calcRegex = /^([0-9]|-|\+|\*|\/|\.)*$/
+
     const keyboard = [
-      7,8,9,"/","C",
-      4,5,6,"*","DEL",
-      1,2,3,"-","AD",
-      0,".","+","="
+      7, 8, 9, "/", "C",
+      4, 5, 6, "*", "DEL",
+      1, 2, 3, "-", "AD",
+      0, ".", "+", "="
     ]
-    const advKeys = [
-      "(",")","HIST","UP","AC"
+    const advancedKeys = [
+      "(", ")", "HIST", "UP", "AC"
     ]
-    
-    const Header = () => <div className="header">Calculator</div>
+
+    const Header = () => <div className="header">Calculadora</div>
 
     const Button = ({ value, onClick, className }) => (
       <button
@@ -42,6 +43,10 @@
     const Calculator = () => {
       const [display, setDisplay] = React.useState("")
       const [error, setError] = React.useState()
+      const [showAd, toggleAd] = React.useState(false)
+      const [history, setHistory] = React.useState([])
+      const [showHist, toggleHist] = React.useState(false)
+      const histRef = React.useRef()
 
       React.useEffect(() => {
         if (error) {
@@ -49,46 +54,68 @@
         }
       }, [display])
 
+      React.useEffect(() => {
+        if (history.length > 2 && showHist) {
+          histRef.current.scrollTop =
+            histRef.current.scrollHeight
+        }
+      }, [history.length, showHist])
+
       const doMath = () => {
         try {
           const result = eval(display)
+          setHistory([].concat(history, {
+            calculation: display,
+            result
+          }))
           setDisplay(`${result}`)
-        } catch (error) {
+
+        } catch (err) {
           setError(`Expressão inválida: ${err.message}`)
         }
       }
 
       const handleClick = (value) => {
         switch (value) {
-          case '=':
+          case "=":
             doMath()
             break
-          case 'C':
-            setDisplay('')
+          case "C":
+            setDisplay("")
             break
-          case 'DEL':
-            setDisplay(display.substring(0, display.length - 1))
+          case "DEL":
+            setDisplay(
+              display.substring(0, display.length - 1)
+            )
             break
-          case 'AD':
-            // doMath()
+          case "AD":
+            toggleAd(!showAd)
+            toggleHist(false)
             break
-          case 'HIST':
-            // doMath()
+          case "HIST":
+            toggleHist(!showHist)
             break
-          case 'AC':
-            setDisplay()
+          case "AC":
+            setDisplay("")
+            setHistory([])
             break
-          case 'UP':
-            // doMath()
+          case "UP":
+            const lastIndex = history.length - 1
+            if (lastIndex > -1) {
+              const newDisplay = history[lastIndex].calculation
+              const newHistory = history.slice(0, lastIndex)
+              setDisplay(newDisplay)
+              setHistory(newHistory)
+            }
             break
-          default: setDisplay(`${display}${value}`)
+          default:
+            setDisplay(`${display}${value}`)
         }
       }
 
-      const buildButtonKey = (value) => {
-        const span2Class = value === 0 ? 'span2' : ''
-        const primaryClass = isNaN(value) ? 'primary' : ''
-
+      const buildButtonKey = value => {
+        const span2Class = value === 0 ? "span2" : ""
+        const primaryClass = isNaN(value) ? "primary" : ""
         return (
           <Button
             key={value}
@@ -101,36 +128,49 @@
 
       return (
         <div className="calculator">
-          <input 
+          {showHist && (
+            <div ref={histRef} className="history">
+              {history.map(({ calculation, result }, index) => (
+                <p key={index}>
+                  {`${calculation} = ${result}`}
+                </p>
+              ))}
+            </div>
+          )}
+          <input
             type="text"
             className="display"
             value={display}
-            onChange={(event) => {
+            onChange={event => {
               const { value } = event.target
 
-              if(calcRegex.test(value)) {
+              if (calcRegex.test(value)) {
                 setDisplay(event.target.value)
               }
             }}
-            onKeyPress={(event) => {
+            onKeyPress={event => {
               if (event.key === 'Enter') {
                 doMath()
               } else if (event.key.toLowerCase() === 'c') {
                 setDisplay('')
               }
             }}
-          >
-           
-          </input>
-          <div className="keyboard">
-            {advKeys.map(buildButtonKey)}
-          </div>
+          />
+          {error && (
+            <p className="error">{error}</p>
+          )}
+          {showAd && (
+            <div className="keyboard">
+              {advancedKeys.map(buildButtonKey)}
+            </div>
+          )}
           <div className="keyboard">
             {keyboard.map(buildButtonKey)}
           </div>
         </div>
       )
     }
+
 
     const App = () => (
       <div>
