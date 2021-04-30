@@ -2,7 +2,9 @@ html {
   box-sizing: border-box;
 }
 
-*, *:after, *:before {
+*,
+*:after,
+*:before {
   box-sizing: inherit;
 }
 
@@ -38,21 +40,20 @@ body {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 2px;
-  font-size: 1.2em;  
+  font-size: 1.2em;
 }
 
-.display:hover{
+.display:hover {
   background-color: rgba(241, 235, 215, 0.185);
 }
 
 .keyboard {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   font-size: 1.2em;
   margin-top: 16px;
 }
-
 
 button {
   border: 0;
@@ -74,5 +75,5 @@ button.primary {
 }
 
 button:hover {
-  opacity: .7;
+  opacity: 0.7;
 }
